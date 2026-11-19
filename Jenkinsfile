@@ -5,6 +5,11 @@ pipeline {
         IMAGE_NAME = 'paintings-hall'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
         APP_PORT = '8081'
+        DB_NAME = 'paintings_hall'
+        DB_USER = 'paintings'
+        DB_PASSWORD = 'paintings_password'
+        GRAFANA_ADMIN_USER = 'admin'
+        GRAFANA_ADMIN_PASSWORD = 'admin'
     }
 
     stages {
@@ -14,20 +19,12 @@ pipeline {
             }
         }
 
-        stage('Load Environment Variables') {
+        stage('Fix Docker Permissions') {
             steps {
                 sh '''
-                    # Fix Docker socket permissions
                     sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
-
-                    if [ -f .env ]; then
-                        set -a
-                        . ./.env
-                        set +a
-                        echo "Environment variables loaded from .env"
-                    else
-                        echo "WARNING: .env file not found"
-                    fi
+                    newgrp docker 2>/dev/null || true
+                    docker info > /dev/null 2>&1 && echo "Docker access OK" || echo "WARNING: Docker access limited"
                 '''
             }
         }
