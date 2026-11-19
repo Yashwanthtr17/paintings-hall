@@ -12,7 +12,6 @@ This is a hands-on project where I'm bringing application development and DevOps
 - **Web Server:** Apache
 - **Containers:** Docker, Docker Compose
 - **CI/CD:** Jenkins
-- **Configuration Management:** Ansible
 - **Monitoring:** Grafana
 - **Version Control:** Git, GitHub
 - **Cloud:** AWS EC2
@@ -22,7 +21,7 @@ This is a hands-on project where I'm bringing application development and DevOps
 
 The application runs as a PHP + Apache container and connects to PostgreSQL through a Docker network. Grafana connects to PostgreSQL for database monitoring and visualization.
 
-Jenkins handles the CI pipeline, while Ansible automates deployment tasks.
+Jenkins handles the CI pipeline.
 
 ```text
                  GitHub
@@ -42,15 +41,9 @@ Jenkins handles the CI pipeline, while Ansible automates deployment tasks.
           |                   |
           +---------+---------+
                     |
-                  Grafana
+Grafana
                     |
                 Dashboards
-
-              Ansible
-                  |
-             Deployment
-                  |
-                AWS EC2
 ```
 
 ## Project Structure
@@ -91,7 +84,7 @@ paintings-hall/
 Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Yashwanthtr17/paintings-hall.git
 cd paintings-hall
 ```
 
@@ -174,7 +167,7 @@ The `Jenkinsfile` contains five stages:
 2. **Build** – Builds the Docker image.
 3. **Run Application** – Starts the application and database.
 4. **API Verification** – Checks the paintings API response.
-5. **Cleanup** – Stops the test environment and removes its named volume.
+5. **Cleanup** – Stops the test environment.
 
 To run the pipeline:
 
@@ -183,4 +176,3 @@ To run the pipeline:
 3. Configure the Git repository.
 4. Set the script path to `Jenkinsfile`.
 5. Run the build and inspect the stage results.
-## CI/CD – Jenkins
