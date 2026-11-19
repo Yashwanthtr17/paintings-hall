@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: paintings-hall-app
+    ports:
+      - "8081:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - paintings-hall
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=paintings_hall
+      - DB_USER=paintings
+      - DB_PASSWORD=paintings_password
+
+  db:
+    image: postgres:15-alpine
+    container_name: paintings-hall-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: paintings
+      POSTGRES_PASSWORD: paintings_password
+      POSTGRES_DB: paintings_hall
+    volumes:
+      - paintings_hall_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - paintings-hall
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: paintings-hall-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - db
+    networks:
+      - paintings-hall
+
+networks:
+  paintings-hall:
+    driver: bridge
+
+volumes:
+  paintings_hall_data:

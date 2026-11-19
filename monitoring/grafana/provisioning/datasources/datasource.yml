@@ -1,0 +1,12 @@
+apiVersion: 1
+
+datasources:
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    url: db:5432
+    user: paintings
+    database: paintings_hall
+    editable: true
+    secureJsonData:
+      password: paintings_password

@@ -1,0 +1,3 @@
+project_dir: "/opt/paintings-hall"
+app_port: 8080
+grafana_port: 3000
