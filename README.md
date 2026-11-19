@@ -160,11 +160,14 @@ docker compose up --build -d
 # View all logs
 docker compose logs -f
 
-# Remove containers and database volume
+# Remove containers (keeps database volume and data)
+docker compose down
+
+# WARNING: This deletes the database volume and ALL data:
 docker compose down -v
 ```
 
-Note: `docker compose down -v` deletes the persistent database volume and its data.
+Note: `docker compose down -v` deletes the persistent database volume and its data. Use `docker compose down` to stop containers without losing data.
 
 ## CI/CD – Jenkins
 

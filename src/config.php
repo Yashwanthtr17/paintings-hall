@@ -7,7 +7,7 @@ if (!function_exists('getDb')) {
         $port = $_ENV['DB_PORT'] ?? '5432';
         $dbname = $_ENV['DB_NAME'] ?? 'paintings_hall';
         $user = $_ENV['DB_USER'] ?? 'paintings';
-        $pass = $_ENV['DB_PASSWORD'] ?? 'paintings_password';
+        $pass = $_ENV['DB_PASSWORD'] ?? '';
 
         $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
         $options = [

@@ -39,6 +39,14 @@
         - docker-compose.yml
         - src
         - init-db
+        - .env.example
+
+    - name: Create .env from example
+      ansible.builtin.copy:
+        src: .env.example
+        dest: "{{ project_dir }}/.env"
+        remote_src: yes
+        mode: '0600'
 
     - name: Build and start services with Docker Compose
       ansible.builtin.command: docker compose up --build -d

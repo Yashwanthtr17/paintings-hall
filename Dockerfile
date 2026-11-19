@@ -3,6 +3,9 @@ FROM php:8.2-apache
 # Install PostgreSQL PDO extension so PHP can talk to Postgres
 RUN docker-php-ext-install pdo pdo_pgsql
 
+# Install curl for healthchecks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Enable Apache mod_rewrite for clean URLs
 RUN a2enmod rewrite
 

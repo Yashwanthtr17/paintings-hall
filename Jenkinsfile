@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'paintings-hall'
         DOCKER_COMPOSE_FILE = 'docker-compose.yml'
-        APP_PORT = '8080'
+        APP_PORT = '8081'
     }
 
     stages {
@@ -46,7 +46,7 @@ pipeline {
 
         stage('Cleanup') {
             steps {
-                sh 'docker compose down -v'
+                sh 'docker compose down'
             }
         }
     }
@@ -54,6 +54,11 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'README.md, Dockerfile, docker-compose.yml, src/**', allowEmptyArchive: true
+        }
+        failure {
+            steps {
+                sh 'docker compose down 2>/dev/null || true'
+            }
         }
     }
 }

@@ -9,4 +9,4 @@ datasources:
     database: paintings_hall
     editable: true
     secureJsonData:
-      password: paintings_password
+      password: ${DB_PASSWORD}

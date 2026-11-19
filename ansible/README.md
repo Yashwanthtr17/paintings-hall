@@ -16,9 +16,10 @@ This directory contains the Ansible playbook that automates deploying the Painti
 2. **Start and enable Docker service** — makes sure Docker is running and starts on boot.
 3. **Install Docker SDK for Python** — installs the `docker` Python module so Ansible can talk to Docker.
 4. **Create project directory** — creates `/opt/paintings-hall` on the target host.
-5. **Copy project files** — copies `Dockerfile`, `docker-compose.yml`, `src/`, and `init-db/` to the target.
-6. **Build and start services** — runs `docker compose up --build -d` in the project directory.
-7. **Wait for application to be ready** — polls `http://localhost:8080` until HTTP `200` is returned (up to 30 retries, 5s delay).
+5. **Copy project files** — copies `Dockerfile`, `docker-compose.yml`, `src/`, `init-db/`, and `.env.example` to the target.
+6. **Create `.env`** — copies `.env.example` to `.env` on the target (review and update credentials before running).
+7. **Build and start services** — runs `docker compose up --build -d` in the project directory.
+8. **Wait for application to be ready** — polls `http://localhost:8081` until HTTP `200` is returned (up to 30 retries, 5s delay).
 8. **Verify Paintings API** — polls `paintings.php` until the JSON response contains `"success"` (up to 10 retries, 5s delay).
 
 ## Key Ansible keywords used
