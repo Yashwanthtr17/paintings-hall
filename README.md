@@ -58,11 +58,6 @@ Jenkins handles the CI pipeline, while Ansible automates deployment tasks.
 ```text
 paintings-hall/
 │
-├── ansible/
-│   ├── inventory.ini
-│   ├── playbook.yml
-│   └── vars.yml
-│
 ├── init-db/
 │   └── 01-schema.sql
 │
@@ -188,22 +183,4 @@ To run the pipeline:
 3. Configure the Git repository.
 4. Set the script path to `Jenkinsfile`.
 5. Run the build and inspect the stage results.
-
-## Configuration Management – Ansible
-
-Ansible is used to automate application deployment.
-
-The playbook performs the following tasks:
-
-- Installs Docker and required packages.
-- Starts the Docker service.
-- Creates the application directory.
-- Copies project files to the target machine.
-- Builds and starts containers.
-- Checks application availability.
-- Verifies the API response.
-
-Run the playbook:
-
-```bash
-ansible-playbook
+## CI/CD – Jenkins
