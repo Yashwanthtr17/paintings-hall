@@ -1,15 +1,28 @@
 pipeline {
     agent any
 
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
+        skipDefaultCheckout()
+    }
+
+    parameters {
+        booleanParam(name: 'DEPLOY', defaultValue: false, description: 'Deploy to a remote Docker host after smoke tests pass')
+        string(name: 'DEPLOY_HOST', defaultValue: '', description: 'Remote host (EC2 public IP or DNS)')
+        string(name: 'DEPLOY_USER', defaultValue: 'ubuntu', description: 'SSH user for the remote host')
+        string(name: 'DEPLOY_PATH', defaultValue: '/home/ubuntu/paintings-hall', description: 'Application directory on the remote host')
+        string(name: 'SSH_CREDENTIALS_ID', defaultValue: 'ec2-ssh-key', description: 'Jenkins SSH credentials ID for the remote host')
+    }
+
     environment {
-        IMAGE_NAME = 'paintings-hall'
-        DOCKER_COMPOSE_FILE = 'docker-compose.yml'
-        APP_PORT = '8081'
-        DB_NAME = 'paintings_hall'
-        DB_USER = 'paintings'
-        DB_PASSWORD = 'paintings_password'
-        GRAFANA_ADMIN_USER = 'admin'
-        GRAFANA_ADMIN_PASSWORD = 'admin'
+        COMPOSE_PROJECT_NAME = 'paintings-hall-ci'
+        APP_PORT = '18081'
+        GRAFANA_PORT = '13000'
+        DB_PORT = '15432'
+        BASE_URL = 'http://localhost:18081'
+        GRAFANA_URL = 'http://localhost:13000'
     }
 
     stages {
@@ -19,57 +32,116 @@ pipeline {
             }
         }
 
-        stage('Fix Docker Permissions') {
+        stage('Check Prerequisites') {
             steps {
                 sh '''
-                    sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
-                    newgrp docker 2>/dev/null || true
-                    docker info > /dev/null 2>&1 && echo "Docker access OK" || echo "WARNING: Docker access limited"
+                    set -eu
+                    docker --version
+                    docker compose version
+                    curl --version | head -n 1
+                    docker info >/dev/null 2>&1 || {
+                        echo "ERROR: the Jenkins user cannot access the Docker daemon."
+                        echo "Add the Jenkins user to the docker group and restart the agent."
+                        exit 1
+                    }
                 '''
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Prepare CI Environment') {
             steps {
-                sh 'docker compose build'
-            }
-        }
-
-        stage('Run Application') {
-            steps {
-                sh 'docker compose up --build -d'
-                sh 'sleep 15'
                 sh '''
-                    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${APP_PORT})
-                    echo "Application HTTP status: ${HTTP_CODE}"
-                    test "${HTTP_CODE}" = "200"
+                    set -eu
+                    umask 077
+
+                    gen_password() {
+                        if command -v openssl >/dev/null 2>&1; then
+                            openssl rand -hex 24
+                        else
+                            od -An -N24 -tx1 /dev/urandom | tr -d ' \\n'
+                        fi
+                    }
+
+                    {
+                        echo "DB_NAME=paintings_hall"
+                        echo "DB_USER=paintings"
+                        echo "DB_PASSWORD=$(gen_password)"
+                        echo "GRAFANA_ADMIN_USER=admin"
+                        echo "GRAFANA_ADMIN_PASSWORD=$(gen_password)"
+                        echo "APP_PORT=${APP_PORT}"
+                        echo "GRAFANA_PORT=${GRAFANA_PORT}"
+                        echo "DB_PORT=${DB_PORT}"
+                    } > .env
+
+                    chmod 600 .env
+                    echo "Generated ephemeral CI credentials in .env"
                 '''
             }
         }
 
-        stage('Verify Paintings API') {
+        stage('Validate Configuration') {
             steps {
-                sh '''
-                    RESPONSE=$(curl -s http://localhost:${APP_PORT}/paintings.php)
-                    echo "Paintings API response: ${RESPONSE}"
-                    echo "${RESPONSE}" | grep -q '"success":true'
-                '''
+                sh 'docker compose -p "$COMPOSE_PROJECT_NAME" config --quiet'
             }
         }
 
-        stage('Cleanup') {
+        stage('Build Image') {
             steps {
-                sh 'docker compose down'
+                sh 'docker compose -p "$COMPOSE_PROJECT_NAME" build'
+            }
+        }
+
+        stage('Lint PHP') {
+            steps {
+                sh 'sh ./scripts/lint-php.sh'
+            }
+        }
+
+        stage('Start Stack') {
+            steps {
+                sh 'docker compose -p "$COMPOSE_PROJECT_NAME" up -d'
+                sh 'sh ./scripts/wait-for-http.sh "$BASE_URL" 180'
+                sh 'sh ./scripts/wait-for-http.sh "$GRAFANA_URL/api/health" 120'
+            }
+        }
+
+        stage('Smoke Tests') {
+            steps {
+                sh 'sh ./tests/smoke.sh'
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                expression { params.DEPLOY }
+            }
+            steps {
+                withEnv([
+                    "DEPLOY_HOST=${params.DEPLOY_HOST}",
+                    "DEPLOY_USER=${params.DEPLOY_USER}",
+                    "DEPLOY_PATH=${params.DEPLOY_PATH}"
+                ]) {
+                    sshagent(credentials: [params.SSH_CREDENTIALS_ID]) {
+                        sh 'sh ./scripts/deploy-ec2.sh'
+                    }
+                }
             }
         }
     }
 
     post {
         always {
-            archiveArtifacts artifacts: 'README.md, Dockerfile, docker-compose.yml, src/**', allowEmptyArchive: true
+            sh 'docker compose -p "$COMPOSE_PROJECT_NAME" ps -a || true'
+            sh 'docker compose -p "$COMPOSE_PROJECT_NAME" logs --no-color > compose-logs.txt 2>&1 || true'
+            archiveArtifacts artifacts: 'compose-logs.txt', allowEmptyArchive: true
+            sh 'docker compose -p "$COMPOSE_PROJECT_NAME" down -v --remove-orphans || true'
+            sh 'rm -f .env'
+        }
+        success {
+            echo 'CI pipeline passed. The ephemeral CI stack was removed.'
         }
         failure {
-            sh 'docker compose down 2>/dev/null || true'
+            echo 'CI pipeline failed. Check compose-logs.txt and the stage output.'
         }
     }
 }

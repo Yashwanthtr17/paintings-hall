@@ -1,0 +1,16 @@
+.git
+.gitignore
+.gitattributes
+.env
+.env.*
+.vscode
+.idea
+**/*.log
+compose-logs.txt
+README.md
+Jenkinsfile
+docker-compose.yml
+monitoring
+tests
+scripts
+Makefile

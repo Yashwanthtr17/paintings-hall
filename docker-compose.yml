@@ -1,9 +1,10 @@
+name: paintings-hall
+
 services:
   app:
     build: .
-    container_name: paintings-hall-app
     ports:
-      - "8081:80"
+      - "${APP_PORT:-8081}:80"
     volumes:
       - ./src:/var/www/html
     depends_on:
@@ -12,61 +13,70 @@ services:
     networks:
       - paintings-hall
     environment:
-      - APACHE_DOCUMENT_ROOT=/var/www/html
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-    env_file:
-      - .env
+      APACHE_DOCUMENT_ROOT: /var/www/html
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-paintings_hall}
+      DB_USER: ${DB_USER:-paintings}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+    restart: unless-stopped
 
   db:
     image: postgres:15-alpine
-    container_name: paintings-hall-db
     ports:
-      - "5432:5432"
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    env_file:
-      - .env
+      POSTGRES_USER: ${DB_USER:-paintings}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env}
+      POSTGRES_DB: ${DB_NAME:-paintings_hall}
     volumes:
       - paintings_hall_data:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      - ./init-db:/docker-entrypoint-initdb.d:ro
     networks:
       - paintings-hall
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-paintings} -d ${DB_NAME:-paintings_hall}"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 10s
+    restart: unless-stopped
 
   grafana:
-    image: grafana/grafana-oss:latest
-    container_name: paintings-hall-grafana
+    image: grafana/grafana-oss:13.0.2
     ports:
-      - "3000:3000"
+      - "${GRAFANA_PORT:-3000}:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
-    env_file:
-      - .env
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD must be set in .env}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/paintings-hall.json
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:-paintings_hall}
+      DB_USER: ${DB_USER:-paintings}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env}
     volumes:
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       db:
         condition: service_healthy
     networks:
       - paintings-hall
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
 
 networks:
   paintings-hall:

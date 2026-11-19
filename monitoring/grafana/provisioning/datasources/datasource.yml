@@ -2,11 +2,16 @@ apiVersion: 1
 
 datasources:
   - name: PostgreSQL
+    uid: paintings-postgres
     type: postgres
     access: proxy
-    url: db:5432
-    user: paintings
-    database: paintings_hall
+    url: ${DB_HOST}:${DB_PORT}
+    user: ${DB_USER}
+    database: ${DB_NAME}
+    isDefault: true
     editable: true
     secureJsonData:
       password: ${DB_PASSWORD}
+    jsonData:
+      sslmode: disable
+      postgresVersion: 1500

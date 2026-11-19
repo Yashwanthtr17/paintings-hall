@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 if (!function_exists('getDb')) {
     function getDb(): PDO {
-        $host = $_ENV['DB_HOST'] ?? 'db';
-        $port = $_ENV['DB_PORT'] ?? '5432';
-        $dbname = $_ENV['DB_NAME'] ?? 'paintings_hall';
-        $user = $_ENV['DB_USER'] ?? 'paintings';
-        $pass = $_ENV['DB_PASSWORD'] ?? '';
+        $host = getenv('DB_HOST') ?: 'db';
+        $port = getenv('DB_PORT') ?: '5432';
+        $dbname = getenv('DB_NAME') ?: 'paintings_hall';
+        $user = getenv('DB_USER') ?: 'paintings';
+        $pass = getenv('DB_PASSWORD') ?: '';
 
         $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
         $options = [

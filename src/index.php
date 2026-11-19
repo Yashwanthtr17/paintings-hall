@@ -3,21 +3,23 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/config.php';
 
-$pdo = getDb();
-$stmt = $pdo->query("SELECT id, title, artist, year, image_url, description, created_at FROM paintings ORDER BY created_at DESC");
-$paintings = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 $rows = '';
-foreach ($paintings as $p) {
-    $title = htmlspecialchars($p['title'] ?? '', ENT_QUOTES, 'UTF-8');
-    $artist = htmlspecialchars($p['artist'] ?? '', ENT_QUOTES, 'UTF-8');
-    $year = $p['year'] ? htmlspecialchars((string) $p['year'], ENT_QUOTES, 'UTF-8') : '';
-    $image_url = $p['image_url'] ? htmlspecialchars($p['image_url'], ENT_QUOTES, 'UTF-8') : '';
-    $description = $p['description'] ? nl2br(htmlspecialchars($p['description'], ENT_QUOTES, 'UTF-8')) : '';
-    $imageTag = $image_url
-        ? '<img src="' . $image_url . '" alt="' . $title . '" class="painting-image">'
-        : '<div class="painting-image-placeholder">No image</div>';
-    $yearHtml = $year ? '<p class="painting-year">' . $year . '</p>' : '';
+
+try {
+    $pdo = getDb();
+    $stmt = $pdo->query("SELECT id, title, artist, year, image_url, description, created_at FROM paintings ORDER BY created_at DESC");
+    $paintings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($paintings as $p) {
+        $title = htmlspecialchars($p['title'] ?? '', ENT_QUOTES, 'UTF-8');
+        $artist = htmlspecialchars($p['artist'] ?? '', ENT_QUOTES, 'UTF-8');
+        $year = !empty($p['year']) ? htmlspecialchars((string) $p['year'], ENT_QUOTES, 'UTF-8') : '';
+        $image_url = !empty($p['image_url']) ? htmlspecialchars($p['image_url'], ENT_QUOTES, 'UTF-8') : '';
+        $description = !empty($p['description']) ? nl2br(htmlspecialchars($p['description'], ENT_QUOTES, 'UTF-8')) : '';
+        $imageTag = $image_url
+            ? '<img src="' . $image_url . '" alt="' . $title . '" class="painting-image">'
+            : '<div class="painting-image-placeholder">No image</div>';
+        $yearHtml = $year ? '<p class="painting-year">' . $year . '</p>' : '';
         $descriptionHtml = $description ? '<p class="painting-description">' . $description . '</p>' : '';
         $rows .= <<<HTML
 <article class="painting-card" data-id="{$p['id']}">
@@ -30,6 +32,11 @@ foreach ($paintings as $p) {
     </div>
 </article>
 HTML;
+    }
+} catch (Throwable $e) {
+    error_log('Failed to load paintings: ' . $e->getMessage());
+    http_response_code(500);
+    $rows = '<p class="error-message">Unable to load paintings. Please try again later.</p>';
 }
 
 ?>

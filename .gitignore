@@ -10,10 +10,13 @@ Thumbs.db
 
 # Environment files - never commit secrets
 .env
-.env.local
+.env.*
+!.env.example
 
-# Logs
+# Logs and CI output
 *.log
+compose-logs.txt
+test-results/
 
 # Docker
 .docker/

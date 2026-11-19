@@ -25,8 +25,8 @@ try {
             exit;
         }
 
-        $title = $input['title'] ?? '';
-        $artist = $input['artist'] ?? '';
+        $title = trim((string) ($input['title'] ?? ''));
+        $artist = trim((string) ($input['artist'] ?? ''));
         $year = $input['year'] ?? null;
         $image_url = $input['image_url'] ?? null;
         $description = $input['description'] ?? null;
@@ -35,6 +35,33 @@ try {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Title and artist are required']);
             exit;
+        }
+
+        if ($year === null || $year === '') {
+            $year = null;
+        } elseif (!is_numeric($year)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Year must be a number']);
+            exit;
+        } else {
+            $year = (int) $year;
+        }
+
+        if ($image_url === null || $image_url === '') {
+            $image_url = null;
+        } elseif (!is_string($image_url) || filter_var($image_url, FILTER_VALIDATE_URL) === false) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Image URL must be a valid URL']);
+            exit;
+        }
+
+        if ($description === null) {
+            $description = null;
+        } else {
+            $description = trim((string) $description);
+            if ($description === '') {
+                $description = null;
+            }
         }
 
         $stmt = $pdo->prepare("INSERT INTO paintings (title, artist, year, image_url, description) VALUES (:title, :artist, :year, :image_url, :description)");
@@ -54,6 +81,7 @@ try {
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Method not allowed']);
 } catch (Throwable $e) {
+    error_log('Paintings API error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'error' => 'Internal server error']);
 }
