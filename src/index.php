@@ -17,14 +17,16 @@ foreach ($paintings as $p) {
     $imageTag = $image_url
         ? '<img src="' . $image_url . '" alt="' . $title . '" class="painting-image">'
         : '<div class="painting-image-placeholder">No image</div>';
-    $rows .= <<<HTML
+    $yearHtml = $year ? '<p class="painting-year">' . $year . '</p>' : '';
+        $descriptionHtml = $description ? '<p class="painting-description">' . $description . '</p>' : '';
+        $rows .= <<<HTML
 <article class="painting-card" data-id="{$p['id']}">
     {$imageTag}
     <div class="painting-info">
         <h3 class="painting-title">{$title}</h3>
         <p class="painting-artist">{$artist}</p>
-        {$year ? '<p class="painting-year">' . $year . '</p>' : ''}
-        {$description ? '<p class="painting-description">' . $description . '</p>' : ''}
+        {$yearHtml}
+        {$descriptionHtml}
     </div>
 </article>
 HTML;
