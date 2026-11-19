@@ -63,10 +63,10 @@ pipeline {
                     }
 
                     {
-                        echo "DB_NAME=paintings_hall"
-                        echo "DB_USER=paintings"
+                        echo "DB_NAME=paintings_hall-db"
+                        echo "DB_USER=yashu"
                         echo "DB_PASSWORD=$(gen_password)"
-                        echo "GRAFANA_ADMIN_USER=admin"
+                        echo "GRAFANA_ADMIN_USER=yashu"
                         echo "GRAFANA_ADMIN_PASSWORD=$(gen_password)"
                         echo "APP_PORT=${APP_PORT}"
                         echo "GRAFANA_PORT=${GRAFANA_PORT}"

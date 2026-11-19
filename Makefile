@@ -48,4 +48,4 @@ shell:
 	$(COMPOSE) exec app sh
 
 db:
-	@set -a; . ./.env; set +a; $(COMPOSE) exec db psql -U "$${DB_USER:-paintings}" -d "$${DB_NAME:-paintings_hall}"
+	@set -a; . ./.env; set +a; $(COMPOSE) exec db psql -U "$${DB_USER:-yashu}" -d "$${DB_NAME:-paintings_hall-db}"

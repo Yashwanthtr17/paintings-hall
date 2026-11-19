@@ -14,11 +14,11 @@ fi
 # Strip CR characters when .env was created on Windows.
 strip_cr() { printf '%s' "${1%$'\r'}"; }
 
-DB_NAME="$(strip_cr "${DB_NAME:-paintings_hall}")"
-DB_USER="$(strip_cr "${DB_USER:-paintings}")"
+DB_NAME="$(strip_cr "${DB_NAME:-paintings_hall-db}")"
+DB_USER="$(strip_cr "${DB_USER:-yashu}")"
 APP_PORT="$(strip_cr "${APP_PORT:-8081}")"
 GRAFANA_PORT="$(strip_cr "${GRAFANA_PORT:-3000}")"
-GRAFANA_ADMIN_USER="$(strip_cr "${GRAFANA_ADMIN_USER:-admin}")"
+GRAFANA_ADMIN_USER="$(strip_cr "${GRAFANA_ADMIN_USER:-yashu}")"
 GRAFANA_ADMIN_PASSWORD="$(strip_cr "${GRAFANA_ADMIN_PASSWORD:-}")"
 COMPOSE_PROJECT_NAME="$(strip_cr "${COMPOSE_PROJECT_NAME:-paintings-hall}")"
 

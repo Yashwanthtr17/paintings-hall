@@ -89,10 +89,10 @@ cp .env.example .env
 Edit `.env` and replace **both passwords** before starting:
 
 ```dotenv
-DB_NAME=paintings_hall
-DB_USER=paintings
+DB_NAME=paintings_hall-db
+DB_USER=yashu
 DB_PASSWORD=change_this_password
-GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_USER=yashu
 GRAFANA_ADMIN_PASSWORD=change_this_password
 APP_PORT=8081
 GRAFANA_PORT=3000
@@ -118,10 +118,10 @@ The first start creates the database schema from `init-db/01-schema.sql`.
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `DB_NAME` | `paintings_hall` | PostgreSQL database name |
-| `DB_USER` | `paintings` | PostgreSQL user |
+| `DB_NAME` | `paintings_hall-db` | PostgreSQL database name |
+| `DB_USER` | `yashu` | PostgreSQL user |
 | `DB_PASSWORD` | required | PostgreSQL password |
-| `GRAFANA_ADMIN_USER` | `admin` | Grafana admin user |
+| `GRAFANA_ADMIN_USER` | `yashu` | Grafana admin user |
 | `GRAFANA_ADMIN_PASSWORD` | required | Grafana admin password |
 | `APP_PORT` | `8081` | Host port for the app |
 | `GRAFANA_PORT` | `3000` | Host port for Grafana |
@@ -158,7 +158,7 @@ docker compose down -v   # WARNING: deletes the database volume
 ### Database access
 
 ```bash
-docker compose exec db psql -U paintings -d paintings_hall
+docker compose exec db psql -U yashu -d paintings_hall-db
 ```
 
 ```sql
@@ -335,8 +335,8 @@ created. Either:
 - Or change the password inside PostgreSQL:
 
   ```bash
-  docker compose exec db psql -U paintings -d paintings_hall \
-    -c "ALTER USER paintings WITH PASSWORD 'new-password';"
+  docker compose exec db psql -U yashu -d paintings_hall-db \
+    -c "ALTER USER yashu WITH PASSWORD 'new-password';"
   ```
 
   Then update `.env` and restart the app:

@@ -16,8 +16,8 @@ services:
       APACHE_DOCUMENT_ROOT: /var/www/html
       DB_HOST: db
       DB_PORT: "5432"
-      DB_NAME: ${DB_NAME:-paintings_hall}
-      DB_USER: ${DB_USER:-paintings}
+      DB_NAME: ${DB_NAME:-paintings_hall-db}
+      DB_USER: ${DB_USER:-yashu}
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost/ || exit 1"]
@@ -32,16 +32,16 @@ services:
     ports:
       - "127.0.0.1:${DB_PORT:-5432}:5432"
     environment:
-      POSTGRES_USER: ${DB_USER:-paintings}
+      POSTGRES_USER: ${DB_USER:-yashu}
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env}
-      POSTGRES_DB: ${DB_NAME:-paintings_hall}
+      POSTGRES_DB: ${DB_NAME:-paintings_hall-db}
     volumes:
       - paintings_hall_data:/var/lib/postgresql/data
       - ./init-db:/docker-entrypoint-initdb.d:ro
     networks:
       - paintings-hall
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-paintings} -d ${DB_NAME:-paintings_hall}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-yashu} -d ${DB_NAME:-paintings_hall-db}"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -53,14 +53,14 @@ services:
     ports:
       - "${GRAFANA_PORT:-3000}:3000"
     environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-yashu}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD must be set in .env}
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/paintings-hall.json
       DB_HOST: db
       DB_PORT: "5432"
-      DB_NAME: ${DB_NAME:-paintings_hall}
-      DB_USER: ${DB_USER:-paintings}
+      DB_NAME: ${DB_NAME:-paintings_hall-db}
+      DB_USER: ${DB_USER:-yashu}
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env}
     volumes:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
