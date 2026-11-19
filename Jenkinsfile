@@ -14,6 +14,24 @@ pipeline {
             }
         }
 
+        stage('Load Environment Variables') {
+            steps {
+                sh '''
+                    # Fix Docker socket permissions
+                    sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
+
+                    if [ -f .env ]; then
+                        set -a
+                        . ./.env
+                        set +a
+                        echo "Environment variables loaded from .env"
+                    else
+                        echo "WARNING: .env file not found"
+                    fi
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker compose build'
