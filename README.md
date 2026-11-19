@@ -15,10 +15,10 @@ manual setup steps.
 ## What the project does
 
 - Shows a responsive gallery of paintings stored in PostgreSQL.
-- Lets me add a painting with a title, artist, year, image URL, and description.
+- Lets me add or delete a painting with a title, artist, year, image URL, and description.
 - Exposes a JSON API at `/paintings.php` for reading and adding paintings.
 - Provides a Grafana dashboard with live PostgreSQL data.
-- Runs a 13-check smoke test suite against the app and Grafana.
+- Runs an 18-check smoke test suite against the app and Grafana.
 - Builds, tests, and cleans up an isolated copy of the stack from one command.
 
 ## Stack
@@ -49,7 +49,7 @@ Jenkins  --->  bash scripts/ci.sh
                    +--> check PHP syntax
                    +--> start an isolated stack
                    +--> wait for health endpoints
-                   +--> run 13 smoke tests
+                   +--> run 18 smoke tests
                    +--> save container logs
                    +--> remove the stack and database volume
 ```
@@ -64,6 +64,8 @@ ports, database volume, and temporary passwords, so it never touches local data.
 I started with a `Dockerfile` based on `php:8.2-apache`. I installed the
 PostgreSQL PHP extension, enabled Apache rewrite rules, and copied `src/` into
 the document root. The app uses PDO with prepared statements for every query.
+The API supports listing, creating, and deleting paintings; delete requests
+validate the id and return HTTP 404 when the painting does not exist.
 
 ### 2. Added PostgreSQL with a schema
 
@@ -124,12 +126,17 @@ archives `compose-logs.txt` after every build.
 
 ### 7. Wrote smoke tests
 
-`tests/smoke.sh` runs 13 checks:
+`tests/smoke.sh` runs 18 checks:
 
 - The home page returns HTTP 200.
 - `GET /paintings.php` reports success.
 - `POST /paintings.php` creates a painting.
 - The new painting appears in the gallery API.
+- `POST` returns the new painting id.
+- `DELETE` without an id returns HTTP 400.
+- `DELETE` with an unknown id returns HTTP 404.
+- `DELETE` removes the painting.
+- The deleted painting no longer appears in the API.
 - `POST` rejects a missing title or artist with HTTP 400.
 - `POST` rejects a non-numeric year with HTTP 400.
 - Unsupported methods return HTTP 405.
@@ -255,7 +262,7 @@ bash scripts/ci.sh
 ```
 
 It performs the full flow described above: prerequisites, temporary credentials,
-build, PHP lint, isolated stack, health checks, 13 smoke tests, logs, and
+build, PHP lint, isolated stack, health checks, 18 smoke tests, logs, and
 cleanup.
 
 The script always cleans up, even if a step fails.
@@ -314,6 +321,7 @@ created on every fresh start without manual clicking.
 |---|---|---|
 | `GET` | `/paintings.php` | List all paintings |
 | `POST` | `/paintings.php` | Add a painting |
+| `DELETE` | `/paintings.php?id={id}` | Delete a painting |
 
 Example:
 
@@ -321,6 +329,12 @@ Example:
 curl -X POST http://localhost:8081/paintings.php \
   -H 'Content-Type: application/json' \
   -d '{"title":"The Starry Night","artist":"Vincent van Gogh","year":1889}'
+```
+
+Delete a painting by id:
+
+```bash
+curl -X DELETE http://localhost:8081/paintings.php?id=1
 ```
 
 ## Security decisions
@@ -353,7 +367,7 @@ A 60-second explanation:
 > containers, and Grafana is provisioned entirely from code. The key design
 > choice is that all automation lives in one Bash script, so the exact same flow
 > runs on my laptop and in Jenkins. The script generates temporary credentials,
-> starts an isolated stack on different ports, runs 13 smoke tests, saves logs,
+> starts an isolated stack on different ports, runs 18 smoke tests, saves logs,
 > and cleans everything up. Jenkins only triggers it and archives the logs.
 
 ## Troubleshooting

@@ -52,10 +52,16 @@
         const media = imageUrl
             ? '<img src="' + imageUrl + '" alt="' + title + '" class="painting-image" loading="lazy">'
             : '<div class="painting-image-placeholder">No image</div>';
+        const deleteButton =
+            '<button type="button" class="painting-delete" data-id="' + escapeHtml(String(painting.id || '')) + '" ' +
+            'aria-label="Delete ' + title + '" title="Delete painting">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>' +
+            '</button>';
 
         return '<article class="painting-card" data-id="' + escapeHtml(String(painting.id || '')) + '">' +
             '<div class="painting-media">' +
             media +
+            deleteButton +
             (year ? '<span class="painting-year-badge">' + year + '</span>' : '') +
             '</div>' +
             '<div class="painting-body">' +
@@ -97,6 +103,37 @@
             console.error(error);
         }
     }
+
+    gallery.addEventListener('click', async (event) => {
+        const button = event.target.closest('.painting-delete');
+        if (!button) {
+            return;
+        }
+
+        const id = button.dataset.id;
+        if (!id || !window.confirm('Delete this painting? This cannot be undone.')) {
+            return;
+        }
+
+        button.disabled = true;
+
+        try {
+            const response = await fetch('paintings.php?id=' + encodeURIComponent(id), {
+                method: 'DELETE',
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'Failed to delete painting');
+            }
+
+            showMessage('Painting deleted.', 'success');
+            await loadPaintings();
+        } catch (error) {
+            showMessage(error.message || 'Could not delete painting.', 'error');
+            button.disabled = false;
+        }
+    });
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();

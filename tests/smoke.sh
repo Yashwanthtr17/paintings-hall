@@ -76,6 +76,25 @@ assert_contains "POST /paintings.php creates a painting" "${POST_BODY}" '"succes
 GET_AFTER="$(curl -s "${BASE_URL}/paintings.php" || true)"
 assert_contains "New painting appears in the gallery API" "${GET_AFTER}" "${TEST_TITLE}"
 
+PAINTING_ID="$(printf '%s' "${POST_BODY}" | sed -n 's/.*"id":\([0-9][0-9]*\).*/\1/p')"
+if [ -n "${PAINTING_ID}" ]; then
+    pass "POST returns the new painting id"
+else
+    fail "POST returns the new painting id"
+fi
+
+DELETE_MISSING_CODE="$(http_code -X DELETE "${BASE_URL}/paintings.php")"
+assert_eq "DELETE without an id returns HTTP 400" "${DELETE_MISSING_CODE}" "400"
+
+DELETE_UNKNOWN_CODE="$(http_code -X DELETE "${BASE_URL}/paintings.php?id=999999999")"
+assert_eq "DELETE with an unknown id returns HTTP 404" "${DELETE_UNKNOWN_CODE}" "404"
+
+DELETE_BODY="$(curl -s -X DELETE "${BASE_URL}/paintings.php?id=${PAINTING_ID}" || true)"
+assert_contains "DELETE removes the painting" "${DELETE_BODY}" '"success":true'
+
+GET_AFTER_DELETE="$(curl -s "${BASE_URL}/paintings.php" || true)"
+assert_not_contains "Deleted painting no longer appears in the API" "${GET_AFTER_DELETE}" "${TEST_TITLE}"
+
 INVALID_CODE="$(http_code -X POST "${BASE_URL}/paintings.php" \
     -H 'Content-Type: application/json' \
     -d '{"title":"","artist":""}')"

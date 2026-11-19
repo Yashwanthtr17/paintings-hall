@@ -46,11 +46,15 @@ try {
             : '<div class="painting-image-placeholder">No image</div>';
         $yearBadge = $year ? '<span class="painting-year-badge">' . $year . '</span>' : '';
         $descriptionHtml = $description ? '<p class="painting-description">' . $description . '</p>' : '';
+        $deleteButton = '<button type="button" class="painting-delete" data-id="' . $id . '" aria-label="Delete ' . $title . '" title="Delete painting">'
+            . '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>'
+            . '</button>';
 
         $rows .= <<<HTML
 <article class="painting-card" data-id="{$id}">
     <div class="painting-media">
         {$imageTag}
+        {$deleteButton}
         {$yearBadge}
     </div>
     <div class="painting-body">

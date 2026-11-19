@@ -78,6 +78,29 @@ try {
         exit;
     }
 
+    if ($method === 'DELETE') {
+        $id = $_GET['id'] ?? null;
+        $id = is_string($id) ? trim($id) : '';
+
+        if ($id === '' || filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'A valid painting id is required']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare('DELETE FROM paintings WHERE id = :id');
+        $stmt->execute([':id' => (int) $id]);
+
+        if ($stmt->rowCount() === 0) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'Painting not found']);
+            exit;
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Painting deleted']);
+        exit;
+    }
+
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Method not allowed']);
 } catch (Throwable $e) {
