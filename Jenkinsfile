@@ -16,9 +16,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("${env.IMAGE_NAME}:${env.BUILD_NUMBER}")
-                }
+                sh 'docker compose build'
             }
         }
 
@@ -56,9 +54,7 @@ pipeline {
             archiveArtifacts artifacts: 'README.md, Dockerfile, docker-compose.yml, src/**', allowEmptyArchive: true
         }
         failure {
-            steps {
-                sh 'docker compose down 2>/dev/null || true'
-            }
+            sh 'docker compose down 2>/dev/null || true'
         }
     }
 }
