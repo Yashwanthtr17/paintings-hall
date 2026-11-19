@@ -45,7 +45,7 @@ try {
             ? '<img src="' . $imageUrl . '" alt="' . $title . '" class="painting-image" loading="lazy">'
             : '<div class="painting-image-placeholder">No image</div>';
         $yearBadge = $year ? '<span class="painting-year-badge">' . $year . '</span>' : '';
-        $descriptionHtml = $description ? '<p class="painting-description">' . $description . '</p>' : '';
+        $descriptionHtml = '<p class="painting-description">' . $description . '</p>';
         $deleteButton = '<button type="button" class="painting-delete" data-id="' . $id . '" aria-label="Delete ' . $title . '" title="Delete painting">'
             . '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>'
             . '</button>';
@@ -78,6 +78,7 @@ HTML;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Paintings Hall — a simple painting gallery built with Docker, PostgreSQL, Jenkins, and Grafana.">
+    <meta name="theme-color" content="#f6f1e8">
     <title>Paintings Hall</title>
     <link rel="stylesheet" href="public/css/style.css">
 </head>
@@ -85,13 +86,16 @@ HTML;
     <header class="site-header">
         <div class="container header-inner">
             <a class="brand" href="/">
-                <span class="brand-mark">PH</span>
+                <span class="brand-mark" aria-hidden="true">PH</span>
                 <span class="brand-copy">
                     <span class="brand-name">Paintings Hall</span>
                     <span class="brand-subtitle">Local DevOps gallery</span>
                 </span>
             </a>
-            <span class="header-badge">Docker · Jenkins · Grafana</span>
+            <span class="header-badge">
+                <span class="status-dot" aria-hidden="true"></span>
+                Docker · Jenkins · Grafana
+            </span>
         </div>
     </header>
 
@@ -124,7 +128,10 @@ HTML;
         <div class="container content-grid">
             <section class="gallery-section" aria-labelledby="gallery-heading">
                 <div class="section-heading">
-                    <h2 id="gallery-heading">Gallery</h2>
+                    <div class="section-title">
+                        <h2 id="gallery-heading">Gallery</h2>
+                        <p class="section-subtitle">A growing collection, newest first.</p>
+                    </div>
                     <span class="section-meta" id="gallery-count"><?php echo $total; ?> <?php echo $total === 1 ? 'piece' : 'pieces'; ?></span>
                 </div>
                 <div class="gallery" id="gallery">
@@ -167,6 +174,7 @@ HTML;
                     <button type="submit" class="btn btn-primary" id="submit-button">Add painting</button>
                 </form>
 
+                <p class="form-note">Stored in PostgreSQL · Visualized in Grafana</p>
                 <div id="form-message" role="alert" aria-live="polite"></div>
             </aside>
         </div>
@@ -174,8 +182,11 @@ HTML;
 
     <footer class="site-footer">
         <div class="container footer-inner">
-            <span>Paintings Hall</span>
-            <span>Docker · PostgreSQL · Grafana · Jenkins</span>
+            <span class="footer-brand">
+                <span class="footer-mark" aria-hidden="true">PH</span>
+                Paintings Hall
+            </span>
+            <span class="footer-tech">Docker · PostgreSQL · Grafana · Jenkins</span>
         </div>
     </footer>
 

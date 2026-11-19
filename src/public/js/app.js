@@ -67,7 +67,7 @@
             '<div class="painting-body">' +
             '<p class="painting-artist">' + artist + '</p>' +
             '<h3 class="painting-title">' + title + '</h3>' +
-            (description ? '<p class="painting-description">' + description + '</p>' : '') +
+            '<p class="painting-description">' + description + '</p>' +
             '</div>' +
             '</article>';
     }
