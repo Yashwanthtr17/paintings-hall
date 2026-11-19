@@ -2,12 +2,13 @@
 set -uo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "${ROOT_DIR}"
+cd "${ROOT_DIR}" || exit 1
 
-if [ -f .env ]; then
+ENV_FILE="${ENV_FILE:-.env}"
+if [ -f "${ENV_FILE}" ]; then
     set -a
-    # shellcheck disable=SC1091
-    . ./.env
+    # shellcheck disable=SC1090
+    . "${ENV_FILE}"
     set +a
 fi
 
@@ -21,6 +22,12 @@ GRAFANA_PORT="$(strip_cr "${GRAFANA_PORT:-3000}")"
 GRAFANA_ADMIN_USER="$(strip_cr "${GRAFANA_ADMIN_USER:-yashu}")"
 GRAFANA_ADMIN_PASSWORD="$(strip_cr "${GRAFANA_ADMIN_PASSWORD:-}")"
 COMPOSE_PROJECT_NAME="$(strip_cr "${COMPOSE_PROJECT_NAME:-paintings-hall}")"
+COMPOSE_ENV_FILE="${COMPOSE_ENV_FILE:-}"
+
+COMPOSE_ARGS=(-p "${COMPOSE_PROJECT_NAME}")
+if [ -n "${COMPOSE_ENV_FILE}" ]; then
+    COMPOSE_ARGS+=(--env-file "${COMPOSE_ENV_FILE}")
+fi
 
 BASE_URL="${BASE_URL:-http://localhost:${APP_PORT}}"
 GRAFANA_URL="${GRAFANA_URL:-http://localhost:${GRAFANA_PORT}}"
@@ -45,7 +52,7 @@ cleanup() {
         echo "WARNING: Docker CLI is unavailable; test row '${TEST_TITLE}' was not removed." >&2
         return
     fi
-    docker compose -p "${COMPOSE_PROJECT_NAME}" exec -T db \
+    docker compose "${COMPOSE_ARGS[@]}" exec -T db \
         psql -U "${DB_USER}" -d "${DB_NAME}" \
         -c "DELETE FROM paintings WHERE title = '${TEST_TITLE}';" >/dev/null 2>&1 \
         || echo "WARNING: could not remove test row '${TEST_TITLE}'." >&2
