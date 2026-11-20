@@ -35,7 +35,7 @@ cd paintings-hall
 cp .env.example .env
 ```
 
-5. Open `.env` and replace both `change_this_password` values.
+5. Open `.env` and replace the `ENTER_YOUR_USER_NAME` and `ENTER_YOUR_PASSWORD` placeholders with your own values.
 6. Start all three services:
 
 ```bash
@@ -52,7 +52,12 @@ The first run downloads images and takes a few minutes.
 | JSON API | <http://localhost:8081/paintings.php> |
 | Grafana | <http://localhost:3000> |
 
-Log in to Grafana with the `GRAFANA_ADMIN_USER` and `GRAFANA_ADMIN_PASSWORD` from `.env`.
+Log in to Grafana with the `GRAFANA_ADMIN_USER` and `GRAFANA_ADMIN_PASSWORD` from `.env`. To find them again, run:
+
+```bash
+grep DB .env
+grep GRAFANA .env
+```
 
 To add a painting, fill in a title and artist, optionally add a year, image URL, and description, then click **Add painting**. Use the trash icon on a card to delete it.
 
