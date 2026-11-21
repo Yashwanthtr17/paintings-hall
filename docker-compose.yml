@@ -25,7 +25,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    restart: unless-stopped
+    restart: "no"
 
   db:
     image: postgres:15-alpine
@@ -46,7 +46,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
-    restart: unless-stopped
+    restart: "no"
 
   grafana:
     image: grafana/grafana-oss:13.0.2
@@ -76,7 +76,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 20s
-    restart: unless-stopped
+    restart: "no"
 
 networks:
   paintings-hall:
