@@ -1,4 +1,24 @@
-#Project Workflow
+# Paintings Hall
+
+A painting gallery web app built as an end-to-end DevOps project. It runs three Docker containers, includes 18 automated tests, and uses a six-stage Jenkins pipeline.
+
+**Stack:** Docker Compose · PHP 8.2 + Apache · PostgreSQL 15 · Grafana · Bash · Jenkins
+
+**Resume line:** Built a Dockerized PHP/PostgreSQL/Grafana application with a six-stage Jenkins pipeline, 18 automated API and monitoring tests, and healthchecked containers.
+
+## Project highlights
+
+- Three containers: the app, PostgreSQL, and Grafana.
+- PostgreSQL schema created automatically on first start.
+- Grafana datasource and dashboard provisioned from code.
+- 18 smoke tests covering the app, API validation, create/delete, and Grafana.
+- Jenkins pipeline with six visible stages and archived logs.
+- Isolated CI with its own ports, volume, project name, and temporary passwords.
+- Automatic cleanup after every CI run, even when a step fails.
+
+# Architecture diagram
+
+Paintings Hall – Project workflow
 
               Developer
                   |
@@ -33,26 +53,6 @@
                   | using the configured data source
                   v
           Visual Monitoring
-
-
-
-# Paintings Hall
-
-A painting gallery web app built as an end-to-end DevOps project. It runs three Docker containers, includes 18 automated tests, and uses a six-stage Jenkins pipeline.
-
-**Stack:** Docker Compose · PHP 8.2 + Apache · PostgreSQL 15 · Grafana · Bash · Jenkins
-
-**Resume line:** Built a Dockerized PHP/PostgreSQL/Grafana application with a six-stage Jenkins pipeline, 18 automated API and monitoring tests, and healthchecked containers.
-
-## Project highlights
-
-- Three containers: the app, PostgreSQL, and Grafana.
-- PostgreSQL schema created automatically on first start.
-- Grafana datasource and dashboard provisioned from code.
-- 18 smoke tests covering the app, API validation, create/delete, and Grafana.
-- Jenkins pipeline with six visible stages and archived logs.
-- Isolated CI with its own ports, volume, project name, and temporary passwords.
-- Automatic cleanup after every CI run, even when a step fails.
 
 ## Run the app
 
