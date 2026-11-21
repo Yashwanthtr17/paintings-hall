@@ -11,13 +11,14 @@
       "id": 1,
       "type": "stat",
       "title": "Total Paintings",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "description": "Total rows in the paintings table.",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
       "datasource": { "type": "postgres", "uid": "paintings-postgres" },
       "targets": [
         {
           "refId": "A",
           "datasource": { "type": "postgres", "uid": "paintings-postgres" },
-          "rawSql": "SELECT COUNT(*) AS value FROM paintings",
+          "rawSql": "SELECT COUNT(*) AS \"Paintings\" FROM paintings",
           "format": "table",
           "rawQuery": true,
           "editorMode": "code"
@@ -28,7 +29,7 @@
         "orientation": "auto",
         "textMode": "auto",
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto"
       },
       "fieldConfig": {
@@ -44,16 +45,240 @@
       }
     },
     {
-      "id": 2,
-      "type": "timeseries",
-      "title": "Paintings Added per Day",
-      "gridPos": { "h": 8, "w": 18, "x": 6, "y": 0 },
+      "id": 5,
+      "type": "stat",
+      "title": "Artists",
+      "description": "Distinct artists in the collection.",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
       "datasource": { "type": "postgres", "uid": "paintings-postgres" },
       "targets": [
         {
           "refId": "A",
           "datasource": { "type": "postgres", "uid": "paintings-postgres" },
-          "rawSql": "SELECT $__timeGroup(created_at, '1d') AS time, COUNT(*) AS value FROM paintings GROUP BY 1 ORDER BY 1",
+          "rawSql": "SELECT COUNT(DISTINCT artist) AS \"Artists\" FROM paintings",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Oldest Year",
+      "description": "Earliest painting year in the collection.",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT MIN(year) AS \"Oldest year\" FROM paintings",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Newest Year",
+      "description": "Latest painting year in the collection.",
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT MAX(year) AS \"Newest year\" FROM paintings",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Database Size",
+      "description": "Total size of the paintings_hall database.",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT pg_database_size(current_database()) AS \"Database size\"",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "Last Painting Added",
+      "description": "How long ago the newest painting was added.",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT MAX(created_at) AS \"Last added\" FROM paintings",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeFromNow",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "text", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Collection Growth (cumulative)",
+      "description": "Cumulative number of paintings over time.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT date_trunc('day', created_at) AS time, SUM(COUNT(*)) OVER (ORDER BY date_trunc('day', created_at)) AS \"Total paintings\" FROM paintings GROUP BY 1 ORDER BY 1",
+          "format": "time_series",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single", "sort": "none" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "showPoints": "auto"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Paintings Added per Day",
+      "description": "New paintings added each day. Respects the dashboard time range.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT $__timeGroup(created_at, '1d') AS time, COUNT(*) AS \"Paintings\" FROM paintings WHERE $__timeFilter(created_at) GROUP BY 1 ORDER BY 1",
           "format": "time_series",
           "rawQuery": true,
           "editorMode": "code"
@@ -79,9 +304,10 @@
     },
     {
       "id": 3,
-      "type": "bargauge",
+      "type": "barchart",
       "title": "Paintings by Artist",
-      "gridPos": { "h": 9, "w": 6, "x": 0, "y": 8 },
+      "description": "Number of paintings per artist.",
+      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 12 },
       "datasource": { "type": "postgres", "uid": "paintings-postgres" },
       "targets": [
         {
@@ -94,14 +320,108 @@
         }
       ],
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "xField": "Artist",
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "groupWidth": 0.7,
+        "barWidth": 0.97,
+        "barRadius": 0,
+        "fullHighlight": false,
+        "tooltip": { "mode": "single", "sort": "none" },
+        "legend": { "showLegend": false, "displayMode": "list", "placement": "bottom", "calcs": [] },
+        "xTickLabelRotation": 0,
+        "xTickLabelMaxLength": 0,
+        "xTickLabelSpacing": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 11,
+      "type": "piechart",
+      "title": "Paintings by Century",
+      "description": "Distribution of paintings by century.",
+      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 12 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT ((year / 100) * 100)::text || 's' AS \"Century\", COUNT(*) AS \"Paintings\" FROM paintings WHERE year IS NOT NULL GROUP BY 1 ORDER BY 1",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "pieType": "donut",
+        "displayLabels": ["name", "percent"],
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "values": ["value"]
+        },
+        "tooltip": { "mode": "single", "sort": "none" },
+        "reduceOptions": { "values": true, "calcs": [], "fields": "/^Paintings$/" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 12,
+      "type": "bargauge",
+      "title": "Collection Completeness",
+      "description": "Share of paintings that have an image, a description, and a year.",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 12 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT ROUND(100.0 * COUNT(*) FILTER (WHERE image_url IS NOT NULL AND image_url <> '') / COUNT(*), 0) AS \"Images\", ROUND(100.0 * COUNT(*) FILTER (WHERE description IS NOT NULL AND description <> '') / COUNT(*), 0) AS \"Descriptions\", ROUND(100.0 * COUNT(*) FILTER (WHERE year IS NOT NULL) / COUNT(*), 0) AS \"Years\" FROM paintings",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "values": true, "calcs": [], "fields": "" },
         "orientation": "horizontal",
         "displayMode": "gradient",
         "showUnfilled": true,
-        "valueMode": "color"
+        "valueMode": "color",
+        "sizing": "auto",
+        "minVizWidth": 8,
+        "minVizHeight": 16
       },
       "fieldConfig": {
-        "defaults": { "min": 0, "unit": "short" },
+        "defaults": {
+          "unit": "percent",
+          "decimals": 0,
+          "min": 0,
+          "max": 100,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 50 },
+              { "color": "green", "value": 90 }
+            ]
+          }
+        },
         "overrides": []
       }
     },
@@ -109,7 +429,8 @@
       "id": 4,
       "type": "table",
       "title": "Recent Paintings",
-      "gridPos": { "h": 9, "w": 18, "x": 6, "y": 8 },
+      "description": "Latest 20 paintings, newest first.",
+      "gridPos": { "h": 9, "w": 14, "x": 0, "y": 21 },
       "datasource": { "type": "postgres", "uid": "paintings-postgres" },
       "targets": [
         {
@@ -128,6 +449,300 @@
             "align": "auto",
             "cellOptions": { "type": "auto" },
             "inspect": false
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 13,
+      "type": "table",
+      "title": "Oldest Paintings",
+      "description": "The 10 oldest paintings by year.",
+      "gridPos": { "h": 9, "w": 10, "x": 14, "y": 21 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT title AS \"Title\", artist AS \"Artist\", year AS \"Year\", created_at AS \"Added\" FROM paintings WHERE year IS NOT NULL ORDER BY year ASC LIMIT 10",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": { "showHeader": true, "cellHeight": "sm" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": { "type": "auto" },
+            "inspect": false
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 14,
+      "type": "gauge",
+      "title": "Cache Hit Ratio",
+      "description": "Percentage of database reads served from memory instead of disk. Higher is better.",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 30 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT ROUND(100.0 * blks_hit / NULLIF(blks_hit + blks_read, 0), 1) AS \"Cache hit\" FROM pg_stat_database WHERE datname = current_database()",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "orientation": "auto",
+        "sizing": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "min": 0,
+          "max": 100,
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 90 },
+              { "color": "green", "value": 95 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 15,
+      "type": "stat",
+      "title": "Connections",
+      "description": "Active and idle connections to the paintings database.",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 30 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT COUNT(*) FILTER (WHERE state = 'active') AS \"Active\", COUNT(*) FILTER (WHERE state = 'idle') AS \"Idle\" FROM pg_stat_activity WHERE datname = current_database()",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 16,
+      "type": "stat",
+      "title": "Table Rows",
+      "description": "Live and dead row versions in the paintings table. Autovacuum cleans up dead rows.",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 30 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT n_live_tup AS \"Live rows\", n_dead_tup AS \"Dead rows\" FROM pg_stat_user_tables WHERE relname = 'paintings'",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 17,
+      "type": "stat",
+      "title": "Last Table Maintenance",
+      "description": "Most recent autovacuum or analyze run on the paintings table.",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 30 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT GREATEST(last_autovacuum, last_vacuum, last_autoanalyze, last_analyze) AS \"Last maintenance\" FROM pg_stat_user_tables WHERE relname = 'paintings'",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeFromNow",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "text", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 18,
+      "type": "stat",
+      "title": "Table Activity",
+      "description": "Inserts, updates, and deletes since PostgreSQL statistics were last reset (usually container start).",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 36 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT n_tup_ins AS \"Inserts\", n_tup_upd AS \"Updates\", n_tup_del AS \"Deletes\" FROM pg_stat_user_tables WHERE relname = 'paintings'",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 19,
+      "type": "stat",
+      "title": "Database Transactions",
+      "description": "Committed and rolled-back transactions since PostgreSQL statistics were last reset.",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 36 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT xact_commit AS \"Commits\", xact_rollback AS \"Rollbacks\" FROM pg_stat_database WHERE datname = current_database()",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 20,
+      "type": "stat",
+      "title": "Postgres Uptime",
+      "description": "How long the PostgreSQL server has been running.",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 36 },
+      "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "postgres", "uid": "paintings-postgres" },
+          "rawSql": "SELECT EXTRACT(EPOCH FROM (NOW() - pg_postmaster_start_time())) * 1000 AS \"Uptime\"",
+          "format": "table",
+          "rawQuery": true,
+          "editorMode": "code"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dtdurationms",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "text", "value": null }]
           }
         },
         "overrides": []
