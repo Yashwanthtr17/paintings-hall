@@ -1,3 +1,41 @@
+#Project Workflow
+
+              Developer
+                  |
+                  | Updates application code
+                  v
+             Git & GitHub
+                  |
+                  | Version control and source code repository
+                  v
+             Jenkins CI/CD
+                  |
+                  | Checkout → Build → Test → Archive
+                  v
+       Docker & Docker Compose
+                  |
+                  | Build and run application and database containers
+                  |
+          +-------+-------+
+          |               |
+          v               v
+     PHP + Apache     PostgreSQL
+          |               |
+          | Gallery       | Artwork
+          | application   | records
+          |               |
+          +-------+-------+
+                  |
+                  v
+               Grafana
+                  |
+                  | Monitoring dashboards
+                  | using the configured data source
+                  v
+          Visual Monitoring
+
+
+
 # Paintings Hall
 
 A painting gallery web app built as an end-to-end DevOps project. It runs three Docker containers, includes 18 automated tests, and uses a six-stage Jenkins pipeline.
