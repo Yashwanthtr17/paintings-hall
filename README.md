@@ -35,7 +35,7 @@ cd paintings-hall
 cp .env.example .env
 ```
 
-5. Open `.env` and replace the `ENTER_YOUR_USER_NAME` and `ENTER_YOUR_PASSWORD` placeholders with your own values.
+5. Open `.env` and replace the `your_db_user`, `your_db_password`, `your_admin_user`, and `your_admin_password` placeholders with your own values.
 6. Start all three services:
 
 ```bash
