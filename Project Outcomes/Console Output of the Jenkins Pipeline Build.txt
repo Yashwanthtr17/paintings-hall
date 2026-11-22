@@ -1,0 +1,377 @@
+Started by an SCM change
+Obtained Jenkinsfile from git https://github.com/Yashwanthtr17/paintings-hall.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/lib/jenkins/workspace/paintings-hall
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+ > git rev-parse --resolve-git-dir /var/lib/jenkins/workspace/paintings-hall/.git # timeout=10
+Fetching changes from the remote Git repository
+ > git config remote.origin.url https://github.com/Yashwanthtr17/paintings-hall.git # timeout=10
+Fetching upstream changes from https://github.com/Yashwanthtr17/paintings-hall.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.53.0'
+ > git fetch --tags --force --progress -- https://github.com/Yashwanthtr17/paintings-hall.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/master^{commit} # timeout=10
+Checking out Revision 5e6d89fa49f9b71b4ceda283bb4790f6edddc2af (refs/remotes/origin/master)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 5e6d89fa49f9b71b4ceda283bb4790f6edddc2af # timeout=10
+Commit message: "Expand Grafana dashboard with collection and database health panels"
+ > git rev-list --no-walk 3d11b53c54843c14509fa4393f47a2b2984db5b8 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] timeout
+Timeout set to expire in 25 min
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Check Docker)
+[Pipeline] sh
++ docker --version
+Docker version 29.1.3, build 29.1.3-0ubuntu4.1
++ docker compose version
+Docker Compose version v5.7.0
++ docker info
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Prepare Test Environment)
+[Pipeline] sh
++ set -eu
++ openssl rand -hex 24
++ DB_PASSWORD=e7069396998524626a525e6b915edaf44df660d264ab658d
++ openssl rand -hex 24
++ GRAFANA_ADMIN_PASSWORD=431a3d8633869b5fba8b1fea2d6a4d0210d7c3b5af5c5a94
++ cat
++ chmod 600 .env.ci
++ docker compose -p paintings-hall-ci --env-file .env.ci config --quiet
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build App Image)
+[Pipeline] sh
++ docker compose -p paintings-hall-ci --env-file .env.ci build
+ Image paintings-hall-ci-app Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 542B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile:
+#2 transferring dockerfile: 798B 0.1s done
+#2 DONE 0.2s
+
+#3 [internal] load metadata for docker.io/library/php:8.2-apache
+#3 DONE 3.1s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 191B 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [1/6] FROM docker.io/library/php:8.2-apache@sha256:b90981025fa445ad7784981110e9423656409177f761eb67b13dc98861049d00
+#6 resolve docker.io/library/php:8.2-apache@sha256:b90981025fa445ad7784981110e9423656409177f761eb67b13dc98861049d00 0.1s done
+#6 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 311B done
+#5 DONE 0.0s
+
+#7 [2/6] RUN apt-get update && apt-get install -y libpq-dev curl && rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [3/6] RUN docker-php-ext-install pdo pdo_pgsql
+#8 CACHED
+
+#9 [4/6] RUN a2enmod rewrite
+#9 CACHED
+
+#10 [5/6] RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+#10 CACHED
+
+#11 [6/6] COPY src/ /var/www/html/
+#11 CACHED
+
+#12 exporting to image
+#12 exporting layers 0.0s done
+#12 exporting manifest sha256:286b043809d4bd721171c6e656ec5be626e2997e8be6b91170d6143d580b798f done
+#12 exporting config sha256:a971f600bbdf534a8f1f3cf9c9d660c80cd2c13be275e79f724d0f81275b28f3 done
+#12 exporting attestation manifest sha256:1f496f63e65fda6b86b85028579f2cdb91d43c5234cab360f39bb0b873d37d96
+#12 exporting attestation manifest sha256:1f496f63e65fda6b86b85028579f2cdb91d43c5234cab360f39bb0b873d37d96 0.0s done
+#12 exporting manifest list sha256:060a26e917c32bac6eb59f2705d511ed3e1b586603d52c4d5511162ce009e5a5 0.0s done
+#12 naming to docker.io/library/paintings-hall-ci-app:latest done
+#12 unpacking to docker.io/library/paintings-hall-ci-app:latest 0.1s done
+#12 DONE 0.4s
+
+#13 resolving provenance for metadata file
+#13 DONE 0.1s
+ Image paintings-hall-ci-app Built 
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Check PHP Syntax)
+[Pipeline] sh
++ docker compose -p paintings-hall-ci --env-file .env.ci run -T --rm --no-deps app sh -c find /var/www/html -name "*.php" -print0 | xargs -0 -n1 php -l
+ Network paintings-hall-ci_paintings-hall Creating 
+ Volume paintings-hall-ci_paintings_hall_data Creating 
+ Volume paintings-hall-ci_paintings_hall_data Creating 
+ Network paintings-hall-ci_paintings-hall Creating 
+ Volume paintings-hall-ci_paintings_hall_data Created 
+ Volume paintings-hall-ci_paintings_hall_data Created 
+ Network paintings-hall-ci_paintings-hall Created 
+ Network paintings-hall-ci_paintings-hall Created 
+ Container paintings-hall-ci-app-run-79589062b187 Creating 
+ Container paintings-hall-ci-app-run-79589062b187 Created 
+No syntax errors detected in /var/www/html/index.php
+No syntax errors detected in /var/www/html/config.php
+No syntax errors detected in /var/www/html/paintings.php
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Start Test Stack)
+[Pipeline] sh
++ docker compose -p paintings-hall-ci --env-file .env.ci up -d
+ Container paintings-hall-ci-db-1 Creating 
+ Container paintings-hall-ci-db-1 Created 
+ Container paintings-hall-ci-grafana-1 Creating 
+ Container paintings-hall-ci-app-1 Creating 
+ Container paintings-hall-ci-grafana-1 Created 
+ Container paintings-hall-ci-app-1 Created 
+ Container paintings-hall-ci-db-1 Starting 
+ Container paintings-hall-ci-db-1 Started 
+ Container paintings-hall-ci-db-1 Waiting 
+ Container paintings-hall-ci-db-1 Healthy 
+ Container paintings-hall-ci-app-1 Starting 
+ Container paintings-hall-ci-grafana-1 Starting 
+ Container paintings-hall-ci-grafana-1 Started 
+ Container paintings-hall-ci-app-1 Started 
++ seq 1 180
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ true
++ APP_CODE=000
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 000 = 200 ]
++ [ 1 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 2 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 3 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 4 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 5 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 6 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 7 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 8 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 9 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 10 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 11 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 12 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 13 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 14 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 15 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 16 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 17 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ true
++ GRAFANA_CODE=000
++ [ 200 = 200 ]
++ [ 000 = 200 ]
++ [ 18 = 180 ]
++ sleep 1
++ curl -s -o /dev/null -w %{http_code} http://localhost:18081/
++ APP_CODE=200
++ curl -s -o /dev/null -w %{http_code} http://localhost:13000/api/health
++ GRAFANA_CODE=200
++ [ 200 = 200 ]
++ [ 200 = 200 ]
++ echo App and Grafana are ready.
+App and Grafana are ready.
++ break
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run 18 Smoke Tests)
+[Pipeline] sh
++ ENV_FILE=.env.ci COMPOSE_ENV_FILE=.env.ci COMPOSE_PROJECT_NAME=paintings-hall-ci bash tests/smoke.sh
+Running smoke tests against http://localhost:18081
+Grafana: http://localhost:13000
+
+PASS: Home page returns HTTP 200
+PASS: GET /paintings.php reports success
+PASS: POST /paintings.php creates a painting
+PASS: New painting appears in the gallery API
+PASS: POST returns the new painting id
+PASS: DELETE without an id returns HTTP 400
+PASS: DELETE with an unknown id returns HTTP 404
+PASS: DELETE removes the painting
+PASS: Deleted painting no longer appears in the API
+PASS: POST rejects missing title/artist with HTTP 400
+PASS: POST rejects a non-numeric year with HTTP 400
+PASS: Unsupported methods return HTTP 405
+PASS: Grafana is healthy
+PASS: Grafana PostgreSQL datasource is healthy
+PASS: Grafana dashboard is provisioned
+PASS: Dashboard contains the Total Paintings panel
+PASS: Grafana can query the paintings table
+PASS: Grafana query returned no API error
+
+Smoke test summary: 18 passed, 0 failed
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] sh
++ docker compose -p paintings-hall-ci --env-file .env.ci down -v --remove-orphans
++ rm -f .env.ci
+[Pipeline] archiveArtifacts
+Archiving artifacts
+[Pipeline] echo
+CI passed: image built, PHP syntax checked, stack started, and all 18 smoke tests passed.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
